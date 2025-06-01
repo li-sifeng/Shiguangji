@@ -13,14 +13,19 @@
       <a href="/">首页</a> |
       <a href="/blog">博客</a> |
       <a href="/tools">小工具</a> |
+      <a href="/game">小游戏</a> |
       <a href="/about">关于</a>
     </nav>
   </header>
   <main>
     <section class="ghibli-welcome">
       <h2>个人博客</h2>
-      <p>这里将展示你的文章列表。后续可支持发布、浏览、编辑等功能。</p>
-      <div class="ghibli-hero" style="background:#e6d3b3;height:180px;display:flex;align-items:center;justify-content:center;">吉卜力风格博客区</div>
+      <form id="post-form">
+        <input id="title" placeholder="标题" required />
+        <textarea id="content" placeholder="内容" required></textarea>
+        <button type="submit">发布</button>
+      </form>
+      <ul id="post-list"></ul>
     </section>
   </main>
   <footer>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>证件照生成工具 | 拾光纪</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <style>
+    .id-photo-tool-container { max-width: 600px; margin: 40px auto; background: #fffbe9; border-radius: 16px; box-shadow: 0 2px 12px #e0d6c3; padding: 24px; }
+    .id-photo-tool-title { text-align: center; font-size: 1.5em; margin-bottom: 16px; }
+    .id-photo-tool-controls { margin-bottom: 16px; text-align: center; }
+    .id-photo-tool-canvas-wrap { display: flex; justify-content: center; align-items: center; background: #e6d3b3; border-radius: 8px; min-height: 220px; }
+    .id-photo-tool-canvas { border: 2px dashed #7bb7a4; border-radius: 8px; background: #fff; cursor: grab; }
+    .id-photo-tool-btn { margin: 0 8px; padding: 6px 18px; border-radius: 6px; border: none; background: #7bb7a4; color: #fff; font-weight: bold; cursor: pointer; }
+    .id-photo-tool-btn:disabled { background: #ccc; }
+    .id-photo-tool-specs { margin: 12px 0; text-align: center; color: #5b4636; }
+  </style>
+</head>
+<body class="ghibli-bg">
+  <header>
+    <h1 class="ghibli-title">拾光纪</h1>
+    <nav>
+      <a href="/">首页</a> |
+      <a href="/blog">博客</a> |
+      <a href="/tools">小工具</a> |
+      <a href="/idphoto">证件照</a> |
+      <a href="/about">关于</a>
+    </nav>
+  </header>
+  <main>
+    <div class="id-photo-tool-container">
+      <div class="id-photo-tool-title">证件照</div>
+      <div class="id-photo-tool-controls">
+        <input type="file" id="idphoto-upload" accept="image/*" />
+        <select id="idphoto-spec">
+          <option value="1inch">一寸（295x413px）</option>
+          <option value="2inch">二寸（413x626px）</option>
+          <option value="sbz">社保证（358x441px）</option>
+          <option value="1inchb">大一寸（390x567px）</option>
+          <option value="2inchsm">小二寸（413x579px）</option>
+          <option value="driver">驾驶证（358x441px）</option>
+          <option value="teacher">教师资格证（260x378px）</option>
+          <option value="civil">公务员（295x413px）</option>
+        </select>
+        <button class="id-photo-tool-btn" id="idphoto-download" disabled>下载证件照</button>
+      </div>
+      <div class="id-photo-tool-specs" id="idphoto-spec-desc">当前规格：一寸（295x413px）</div>
+      <div class="id-photo-tool-canvas-wrap">
+        <canvas id="idphoto-canvas" class="id-photo-tool-canvas" width="295" height="413"></canvas>
+      </div>
+      <div style="text-align:center;color:#a89c8e;font-size:0.95em;margin-top:8px;">可拖动图片调整位置，裁剪后下载</div>
+    </div>
+    <script>
+      // 证件照规格
+      const specs = {
+        '1inch': { w: 295, h: 413, desc: '一寸（295x413px）' },
+        '2inch': { w: 413, h: 626, desc: '二寸（413x626px）' },
+        'sbz':   { w: 358, h: 441, desc: '社保证（358x441px）' },
+        '1inchb': { w: 390, h: 567, desc: '大一寸（390x567px）' },
+        '2inchsm': { w: 413, h: 579, desc: '小二寸（413x579px）' },
+        'driver': { w: 358, h: 441, desc: '驾驶证（358x441px）' },
+        'teacher': { w: 260, h: 378, desc: '教师资格证（260x378px）' },
+        'civil': { w: 295, h: 413, desc: '公务员（295x413px）' }
+      };
+      let currentSpec = '1inch';
+      let img = null;
+      let imgX = 0, imgY = 0, imgScale = 1, dragging = false, dragStartX = 0, dragStartY = 0, imgStartX = 0, imgStartY = 0;
+      const upload = document.getElementById('idphoto-upload');
+      const specSel = document.getElementById('idphoto-spec');
+      const specDesc = document.getElementById('idphoto-spec-desc');
+      const canvas = document.getElementById('idphoto-canvas');
+      const ctx = canvas.getContext('2d');
+      const downloadBtn = document.getElementById('idphoto-download');
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (img) {
+          const drawW = img.width * imgScale;
+          const drawH = img.height * imgScale;
+          ctx.drawImage(img, imgX, imgY, drawW, drawH);
+        }
+      }
+
+      upload.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          img = new window.Image();
+          img.onload = function() {
+            // 居中显示
+            imgScale = Math.max(canvas.width / img.width, canvas.height / img.height);
+            imgX = (canvas.width - img.width * imgScale) / 2;
+            imgY = (canvas.height - img.height * imgScale) / 2;
+            draw();
+            downloadBtn.disabled = false;
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // 拖动图片
+      canvas.addEventListener('mousedown', e => {
+        if (!img) return;
+        dragging = true;
+        dragStartX = e.offsetX;
+        dragStartY = e.offsetY;
+        imgStartX = imgX;
+        imgStartY = imgY;
+      });
+      canvas.addEventListener('mousemove', e => {
+        if (!img || !dragging) return;
+        imgX = imgStartX + (e.offsetX - dragStartX);
+        imgY = imgStartY + (e.offsetY - dragStartY);
+        draw();
+      });
+      canvas.addEventListener('mouseup', () => dragging = false);
+      canvas.addEventListener('mouseleave', () => dragging = false);
+
+      // 滚轮缩放
+      canvas.addEventListener('wheel', e => {
+        if (!img) return;
+        e.preventDefault();
+        const scaleDelta = e.deltaY < 0 ? 1.05 : 0.95;
+        imgScale *= scaleDelta;
+        // 缩放时保持中心点不变
+        const cx = e.offsetX, cy = e.offsetY;
+        imgX = cx - (cx - imgX) * scaleDelta;
+        imgY = cy - (cy - imgY) * scaleDelta;
+        draw();
+      });
+
+      // 规格切换
+      specSel.addEventListener('change', e => {
+        currentSpec = e.target.value;
+        const { w, h, desc } = specs[currentSpec];
+        canvas.width = w;
+        canvas.height = h;
+        specDesc.textContent = '当前规格：' + desc;
+        if (img) {
+          imgScale = Math.max(canvas.width / img.width, canvas.height / img.height);
+          imgX = (canvas.width - img.width * imgScale) / 2;
+          imgY = (canvas.height - img.height * imgScale) / 2;
+        }
+        draw();
+      });
+
+      // 下载图片
+      downloadBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = `证件照_${specs[currentSpec].desc}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    </script>
+  </main>
+  <footer>
+    <small>© 2025 拾光纪 | Inspired by Studio Ghibli</small>
+  </footer>
+</body>
+</html>
