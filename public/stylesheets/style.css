@@ -1,0 +1,64 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+body.ghibli-bg {
+  /* background: url('/images/my-ghibli-bg.jpg') no-repeat center center fixed; */
+  background: linear-gradient(135deg, #f7ecd7 0%, #cbe6e6 100%);
+  font-family: 'Segoe Print', 'Comic Sans MS', 'Arial', sans-serif;
+  color: #3a2c1a;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: rgba(255,255,255,0.7);
+  padding: 24px 0 12px 0;
+  text-align: center;
+  box-shadow: 0 2px 8px #e0d6c3;
+}
+.ghibli-title {
+  font-size: 2.5em;
+  letter-spacing: 0.1em;
+  color: #5b4636;
+  margin: 0 0 8px 0;
+  font-family: 'Segoe Print', 'Comic Sans MS', 'Arial', sans-serif;
+}
+nav a {
+  color: #5b4636;
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+nav a:hover {
+  color: #7bb7a4;
+}
+.ghibli-welcome {
+  text-align: center;
+  margin: 48px 0 32px 0;
+}
+.ghibli-welcome h2 {
+  font-size: 2em;
+  color: #7bb7a4;
+}
+.ghibli-hero {
+  margin-top: 24px;
+  width: 320px;
+  max-width: 90vw;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px #b2c9c9;
+}
+footer {
+  text-align: center;
+  color: #a89c8e;
+  padding: 24px 0 12px 0;
+  font-size: 0.9em;
+  background: rgba(255,255,255,0.5);
+  margin-top: 48px;
+}
